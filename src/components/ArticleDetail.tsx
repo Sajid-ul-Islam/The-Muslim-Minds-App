@@ -1,4 +1,17 @@
-import type { Article } from '../data';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Share,
+  Alert,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { Article } from '../data';
+import { colors, getGradientColors, getCategoryBadgeStyle } from '../theme';
 
 interface ArticleDetailProps {
   article: Article;
@@ -6,120 +19,324 @@ interface ArticleDetailProps {
 }
 
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `${article.title}\nBy ${article.author}\n\nRead more on The Muslim Minds: https://themuslimminds.org`,
+        title: article.title,
+      });
+    } catch (error) {
+      console.log('Error sharing:', error);
+    }
+  };
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    Alert.alert(
+      !isBookmarked ? 'Bookmarked' : 'Removed',
+      !isBookmarked ? 'Article added to your bookmarks.' : 'Article removed from bookmarks.'
+    );
+  };
+
+  const badgeStyle = getCategoryBadgeStyle(article.categoryColor);
+  const initials = article.author
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2);
+
   return (
-    <div className="pb-8 animate-fade-in">
-      {/* Hero Image */}
-      <div className={`relative bg-gradient-to-br ${article.imageGradient} h-64`}>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-        
-        {/* Back Button */}
-        <button
-          onClick={onBack}
-          className="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white border border-white/20 active:bg-black/50 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Hero Header */}
+      <LinearGradient
+        colors={getGradientColors(article.imageGradient)}
+        style={styles.hero}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.heroButtonsRow}>
+          <TouchableOpacity
+            style={styles.circleButton}
+            activeOpacity={0.8}
+            onPress={onBack}
+          >
+            <Ionicons name="arrow-back" size={20} color="#ffffff" />
+          </TouchableOpacity>
 
-        {/* Share Button */}
-        <button className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white border border-white/20 active:bg-black/50 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-          </svg>
-        </button>
+          <TouchableOpacity
+            style={styles.circleButton}
+            activeOpacity={0.8}
+            onPress={handleShare}
+          >
+            <Ionicons name="share-social-outline" size={18} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
 
-        {/* Category Badge */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <span className={`inline-block px-2.5 py-1 rounded-full text-[11px] font-medium ${article.categoryColor} shadow-sm`}>
-            {article.category}
-          </span>
-        </div>
-      </div>
+        <View style={styles.heroBottomRow}>
+          <View style={[styles.categoryBadge, { backgroundColor: badgeStyle.bg }]}>
+            <Text style={[styles.categoryBadgeText, { color: badgeStyle.text }]}>
+              {article.category}
+            </Text>
+          </View>
+        </View>
+      </LinearGradient>
 
-      {/* Content */}
-      <div className="px-5 -mt-4 relative">
-        <div className="bg-white rounded-t-2xl pt-6 pb-4">
-          {/* Title */}
-          <h1 className="text-gray-900 font-bold text-xl leading-tight">
-            {article.title}
-          </h1>
+      {/* Content Body */}
+      <View style={styles.contentWrapper}>
+        <Text style={styles.title}>{article.title}</Text>
 
-          {/* Author & Date */}
-          <div className="flex items-center gap-3 mt-4 pb-4 border-b border-gray-100">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white font-bold text-xs shadow">
-              {article.author.split(' ').map(n => n[0]).join('').slice(0, 2)}
-            </div>
-            <div>
-              <p className="text-gray-900 font-semibold text-sm">{article.author}</p>
-              <p className="text-gray-500 text-xs">{article.date}</p>
-            </div>
-          </div>
+        {/* Author info */}
+        <View style={styles.authorRow}>
+          <LinearGradient
+            colors={['#10b981', '#0d9488']}
+            style={styles.authorAvatar}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Text style={styles.authorInitials}>{initials}</Text>
+          </LinearGradient>
+          <View style={styles.authorDetails}>
+            <Text style={styles.authorName}>{article.author}</Text>
+            <Text style={styles.articleDate}>{article.date}</Text>
+          </View>
+        </View>
 
-          {/* Article Body */}
-          <div className="mt-4 space-y-4">
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {article.excerpt}
-            </p>
-            <p className="text-gray-700 text-sm leading-relaxed">
-              The exploration of these ideas requires us to engage deeply with both classical 
-              Islamic intellectual traditions and contemporary theoretical frameworks. Through 
-              careful analysis, we can uncover new perspectives that challenge dominant narratives 
-              and open up fresh avenues for understanding.
-            </p>
-            <p className="text-gray-700 text-sm leading-relaxed">
-              This article examines the historical context and contemporary implications of the 
-              topic at hand. By drawing on diverse sources — from classical texts to modern 
-              scholarship — we aim to provide a comprehensive analysis that speaks to both 
-              academic rigor and practical relevance.
-            </p>
+        {/* Text Paragraphs */}
+        <Text style={[styles.paragraph, styles.leadParagraph]}>
+          {article.excerpt}
+        </Text>
 
-            {/* Pull Quote */}
-            <div className="border-l-4 border-emerald-500 pl-4 py-2 my-6 bg-emerald-50 rounded-r-lg">
-              <p className="text-emerald-900 text-sm font-medium italic leading-relaxed">
-                "When a civilization loses its language, it loses the ability to interpret its world. 
-                Language is not merely a messenger of communication; it is the grammar of existence."
-              </p>
-            </div>
+        <Text style={styles.paragraph}>
+          The exploration of these ideas requires us to engage deeply with both classical Islamic intellectual traditions and contemporary theoretical frameworks. Through careful analysis, we can uncover new perspectives that challenge dominant narratives and open up fresh avenues for understanding.
+        </Text>
 
-            <p className="text-gray-700 text-sm leading-relaxed">
-              The implications of this analysis extend far beyond academic discourse. They touch 
-              upon fundamental questions of identity, knowledge production, and the politics of 
-              representation in our contemporary world. As we navigate these complex terrain, 
-              it becomes clear that intellectual decolonization is not merely an academic exercise 
-              but a vital project for the Muslim ummah.
-            </p>
+        <Text style={styles.paragraph}>
+          This article examines the historical context and contemporary implications of the topic at hand. By drawing on diverse sources — from classical texts to modern scholarship — we aim to provide a comprehensive analysis that speaks to both academic rigor and practical relevance.
+        </Text>
 
-            <p className="text-gray-700 text-sm leading-relaxed">
-              Through engagement with both primary sources and secondary literature, this piece 
-              seeks to contribute to ongoing conversations about the future of Muslim intellectual 
-              life. The challenges are significant, but so too are the resources available within 
-              our own tradition for meeting them.
-            </p>
-          </div>
+        {/* Pull Quote */}
+        <View style={styles.pullQuote}>
+          <Text style={styles.pullQuoteText}>
+            “When a civilization loses its language, it loses the ability to interpret its world. Language is not merely a messenger of communication; it is the grammar of existence.”
+          </Text>
+        </View>
 
-          {/* Tags */}
-          <div className="mt-6 pt-4 border-t border-gray-100">
-            <div className="flex flex-wrap gap-2">
-              {['Philosophy', 'Islamic Thought', 'Analysis', 'Contemporary'].map((tag) => (
-                <span key={tag} className="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] rounded-full font-medium">
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          </div>
+        <Text style={styles.paragraph}>
+          The implications of this analysis extend far beyond academic discourse. They touch upon fundamental questions of identity, knowledge production, and the politics of representation in our contemporary world. As we navigate these complex terrain, it becomes clear that intellectual decolonization is not merely an academic exercise but a vital project for the Muslim ummah.
+        </Text>
 
-          {/* Actions */}
-          <div className="mt-5 flex items-center gap-3">
-            <button className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white py-3 rounded-xl font-medium text-sm active:bg-emerald-700 transition-colors shadow-sm">
-              <span>📖</span> Read Full Article
-            </button>
-            <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 active:bg-gray-200 transition-colors">
-              🔖
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        <Text style={styles.paragraph}>
+          Through engagement with both primary sources and secondary literature, this piece seeks to contribute to ongoing conversations about the future of Muslim intellectual life. The challenges are significant, but so too are the resources available within our own tradition for meeting them.
+        </Text>
+
+        {/* Tags */}
+        <View style={styles.tagsContainer}>
+          {['Philosophy', 'Islamic Thought', 'Analysis', 'Contemporary'].map((tag) => (
+            <View key={tag} style={styles.tagBadge}>
+              <Text style={styles.tagText}>#{tag}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Action Buttons */}
+        <View style={styles.actionsRow}>
+          <TouchableOpacity
+            style={styles.readFullBtn}
+            activeOpacity={0.8}
+            onPress={() => Alert.alert('Full Article', 'Opening complete article in reader mode...')}
+          >
+            <Ionicons name="book-outline" size={18} color="#ffffff" style={{ marginRight: 6 }} />
+            <Text style={styles.readFullText}>Read Full Article</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.bookmarkBtn, isBookmarked && styles.bookmarkBtnActive]}
+            activeOpacity={0.8}
+            onPress={handleBookmark}
+          >
+            <Ionicons
+              name={isBookmarked ? 'bookmark' : 'bookmark-outline'}
+              size={20}
+              color={isBookmarked ? colors.primary : '#64748b'}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  hero: {
+    height: 250,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 20,
+    justifyContent: 'space-between',
+  },
+  heroButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  circleButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroBottomRow: {
+    alignItems: 'flex-start',
+  },
+  categoryBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  categoryBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  contentWrapper: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -16,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#0f172a',
+    lineHeight: 28,
+    letterSpacing: -0.4,
+  },
+  authorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 18,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  authorAvatar: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  authorInitials: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  authorDetails: {
+    justifyContent: 'center',
+  },
+  authorName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  articleDate: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  paragraph: {
+    fontSize: 14,
+    lineHeight: 23,
+    color: '#334155',
+    marginBottom: 16,
+  },
+  leadParagraph: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#1e293b',
+    lineHeight: 24,
+  },
+  pullQuote: {
+    backgroundColor: '#ecfdf5',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.primary,
+    borderRadius: 8,
+    padding: 14,
+    marginVertical: 12,
+  },
+  pullQuoteText: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: '#065f46',
+    lineHeight: 22,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+  },
+  tagBadge: {
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+  },
+  tagText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#475569',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 24,
+  },
+  readFullBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  readFullText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  bookmarkBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bookmarkBtnActive: {
+    backgroundColor: '#d1fae5',
+  },
+});

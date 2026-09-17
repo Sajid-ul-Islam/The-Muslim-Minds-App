@@ -1,5 +1,26 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { getGradientColors } from '../theme';
+
+interface VideoItem {
+  id: number;
+  title: string;
+  duration: string;
+  speaker: string;
+  views: string;
+  gradient: string;
+}
+
 export default function VideosScreen() {
-  const videos = [
+  const videos: VideoItem[] = [
     {
       id: 1,
       title: 'Bengali Nationalism and Hindutva Narrative Interaction',
@@ -51,57 +72,232 @@ export default function VideosScreen() {
   ];
 
   return (
-    <div className="pb-4">
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
-      <div className="bg-white px-5 pt-6 pb-4 border-b border-gray-100 sticky top-0 z-10">
-        <h1 className="text-2xl font-bold text-gray-900">Videos</h1>
-        <p className="text-gray-500 text-sm mt-0.5">Lectures, interviews & discussions</p>
-      </div>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Videos</Text>
+        <Text style={styles.headerSubtitle}>Lectures, interviews & discussions</Text>
+      </View>
 
       {/* Featured Video */}
-      <div className="px-5 mt-4">
-        <div className="relative rounded-2xl overflow-hidden shadow-lg">
-          <div className="bg-gradient-to-br from-emerald-700 via-teal-800 to-cyan-900 h-48 flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/40">
-              <span className="text-white text-3xl ml-1">▶</span>
-            </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">LIVE</span>
-            <h3 className="text-white font-bold text-sm mt-1.5">New Diploma Program 2026 — Introduction</h3>
-            <p className="text-white/70 text-xs mt-0.5">Critical Social Thought & Islamic Tradition</p>
-          </div>
-        </div>
-      </div>
+      <View style={styles.sectionContainer}>
+        <TouchableOpacity style={styles.featuredCard} activeOpacity={0.9}>
+          <LinearGradient
+            colors={['#047857', '#0f766e', '#164e63']}
+            style={styles.featuredGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.featuredPlayButton}>
+              <Ionicons name="play" size={28} color="#ffffff" style={{ marginLeft: 3 }} />
+            </View>
+            <View style={styles.featuredOverlay}>
+              <View style={styles.liveBadge}>
+                <Text style={styles.liveBadgeText}>LIVE</Text>
+              </View>
+              <Text style={styles.featuredTitle}>
+                New Diploma Program 2026 — Introduction
+              </Text>
+              <Text style={styles.featuredSubtitle}>
+                Critical Social Thought & Islamic Tradition
+              </Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
 
       {/* Video List */}
-      <div className="mt-5 px-5">
-        <h3 className="text-gray-900 font-bold text-base mb-3">Recent Videos</h3>
-        <div className="space-y-3">
+      <View style={[styles.sectionContainer, styles.lastSection]}>
+        <Text style={styles.sectionTitle}>Recent Videos</Text>
+        <View style={styles.videosList}>
           {videos.map((video) => (
-            <div
-              key={video.id}
-              className="flex gap-3 p-2 rounded-xl bg-white border border-gray-100 shadow-sm cursor-pointer active:bg-gray-50 transition-colors"
-            >
-              <div className={`relative w-28 h-20 rounded-lg bg-gradient-to-br ${video.gradient} shrink-0 flex items-center justify-center`}>
-                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
-                  <span className="text-white text-sm ml-0.5">▶</span>
-                </div>
-                <span className="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded">
-                  {video.duration}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0 py-0.5">
-                <h4 className="text-gray-900 font-semibold text-sm leading-tight line-clamp-2">
+            <TouchableOpacity key={video.id} style={styles.videoCard} activeOpacity={0.7}>
+              <LinearGradient
+                colors={getGradientColors(video.gradient)}
+                style={styles.videoThumbnail}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.smallPlayButton}>
+                  <Ionicons name="play" size={14} color="#ffffff" style={{ marginLeft: 2 }} />
+                </View>
+                <View style={styles.durationBadge}>
+                  <Text style={styles.durationText}>{video.duration}</Text>
+                </View>
+              </LinearGradient>
+
+              <View style={styles.videoInfo}>
+                <Text style={styles.videoTitle} numberOfLines={2}>
                   {video.title}
-                </h4>
-                <p className="text-gray-500 text-[11px] mt-1.5">{video.speaker}</p>
-                <p className="text-gray-400 text-[10px] mt-0.5">{video.views} views</p>
-              </div>
-            </div>
+                </Text>
+                <Text style={styles.videoSpeaker}>{video.speaker}</Text>
+                <Text style={styles.videoViews}>{video.views} views</Text>
+              </View>
+            </TouchableOpacity>
           ))}
-        </div>
-      </div>
-    </div>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#0f172a',
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  sectionContainer: {
+    marginTop: 18,
+    paddingHorizontal: 20,
+  },
+  lastSection: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0f172a',
+    marginBottom: 12,
+  },
+  featuredCard: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  featuredGradient: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featuredPlayButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featuredOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+  },
+  liveBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  liveBadgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  featuredTitle: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  featuredSubtitle: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  videosList: {
+    gap: 12,
+  },
+  videoCard: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  videoThumbnail: {
+    width: 110,
+    height: 74,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  smallPlayButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  durationBadge: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  durationText: {
+    color: '#ffffff',
+    fontSize: 9,
+    fontWeight: '600',
+  },
+  videoInfo: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  videoTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1e293b',
+    lineHeight: 17,
+  },
+  videoSpeaker: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 4,
+  },
+  videoViews: {
+    fontSize: 10,
+    color: '#94a3b8',
+    marginTop: 2,
+  },
+});

@@ -1,114 +1,355 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Linking,
+  Alert,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../theme';
+
 export default function AboutScreen() {
+  const handleConnect = (type: string) => {
+    if (type === 'Website') {
+      Linking.openURL('https://themuslimminds.org').catch(() => {
+        Alert.alert('Website', 'Visit https://themuslimminds.org');
+      });
+    } else {
+      Alert.alert(type, `Connect with us via ${type} at contact@themuslimminds.org`);
+    }
+  };
+
+  const focusAreas = [
+    { icon: '📚', title: 'Philosophy & Political Thought', desc: 'Critical engagement with Western and Islamic philosophical traditions' },
+    { icon: '🏛️', title: 'History & Decolonial Studies', desc: 'Re-examining history through decolonial frameworks' },
+    { icon: '🌍', title: 'Geopolitics & Contemporary Analysis', desc: 'Understanding current events through Islamic perspectives' },
+    { icon: '🕌', title: 'Islamic Thought & Tradition', desc: 'Exploring the richness of Islamic intellectual heritage' },
+  ];
+
   return (
-    <div className="pb-4">
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
-      <div className="bg-gradient-to-br from-emerald-700 via-emerald-800 to-teal-900 px-5 pt-8 pb-10 text-center">
-        <div className="w-20 h-20 mx-auto rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30 shadow-lg">
-          <span className="text-4xl">🕌</span>
-        </div>
-        <h1 className="text-white text-2xl font-bold mt-4">The Muslim Minds</h1>
-        <p className="text-emerald-200 text-sm mt-1">Intellectual Discourse & Analysis</p>
-        <p className="text-emerald-300/70 text-xs mt-2 max-w-xs mx-auto">
+      <LinearGradient
+        colors={['#047857', '#065f46', '#134e4a']}
+        style={styles.header}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.mosqueBadge}>
+          <Text style={styles.mosqueIcon}>🕌</Text>
+        </View>
+        <Text style={styles.headerTitle}>The Muslim Minds</Text>
+        <Text style={styles.headerSubtitle}>Intellectual Discourse & Analysis</Text>
+        <Text style={styles.headerBio}>
           Exploring philosophy, history, politics, and Islamic thought through rigorous intellectual discourse.
-        </p>
-      </div>
+        </Text>
+      </LinearGradient>
 
-      {/* Stats */}
-      <div className="mx-5 -mt-5 bg-white rounded-2xl shadow-lg p-4 grid grid-cols-3 gap-3">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-emerald-700">100+</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">Articles</p>
-        </div>
-        <div className="text-center border-x border-gray-100">
-          <p className="text-2xl font-bold text-emerald-700">50+</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">Videos</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-emerald-700">30+</p>
-          <p className="text-[10px] text-gray-500 mt-0.5">Speakers</p>
-        </div>
-      </div>
+      {/* Stats Card */}
+      <View style={styles.statsWrapper}>
+        <View style={styles.statsCard}>
+          <View style={styles.statCol}>
+            <Text style={styles.statNumber}>100+</Text>
+            <Text style={styles.statLabel}>Articles</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statCol}>
+            <Text style={styles.statNumber}>50+</Text>
+            <Text style={styles.statLabel}>Videos</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statCol}>
+            <Text style={styles.statNumber}>30+</Text>
+            <Text style={styles.statLabel}>Speakers</Text>
+          </View>
+        </View>
+      </View>
 
-      {/* About Section */}
-      <div className="px-5 mt-6">
-        <h3 className="text-gray-900 font-bold text-base mb-2">About Us</h3>
-        <p className="text-gray-600 text-sm leading-relaxed">
-          The Muslim Minds is a platform dedicated to fostering critical intellectual discourse 
-          within the Muslim community. We explore philosophy, history, political thought, 
-          decolonial studies, and Islamic tradition through rigorous analysis and diverse perspectives.
-        </p>
-        <p className="text-gray-600 text-sm leading-relaxed mt-3">
-          Our mission is to decolonize knowledge systems and provide a space for authentic 
-          Muslim intellectual engagement with contemporary issues.
-        </p>
-      </div>
+      {/* About Us */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>About Us</Text>
+        <Text style={styles.paragraph}>
+          The Muslim Minds is a platform dedicated to fostering critical intellectual discourse within the Muslim community. We explore philosophy, history, political thought, decolonial studies, and Islamic tradition through rigorous analysis and diverse perspectives.
+        </Text>
+        <Text style={[styles.paragraph, { marginTop: 10 }]}>
+          Our mission is to decolonize knowledge systems and provide a space for authentic Muslim intellectual engagement with contemporary issues.
+        </Text>
+      </View>
 
-      {/* Mission */}
-      <div className="px-5 mt-6">
-        <h3 className="text-gray-900 font-bold text-base mb-3">Our Focus Areas</h3>
-        <div className="space-y-2">
-          {[
-            { icon: '📚', title: 'Philosophy & Political Thought', desc: 'Critical engagement with Western and Islamic philosophical traditions' },
-            { icon: '🏛️', title: 'History & Decolonial Studies', desc: 'Re-examining history through decolonial frameworks' },
-            { icon: '🌍', title: 'Geopolitics & Contemporary Analysis', desc: 'Understanding current events through Islamic perspectives' },
-            { icon: '🕌', title: 'Islamic Thought & Tradition', desc: 'Exploring the richness of Islamic intellectual heritage' },
-          ].map((item, idx) => (
-            <div key={idx} className="flex gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-              <span className="text-xl">{item.icon}</span>
-              <div>
-                <h4 className="text-gray-900 font-semibold text-sm">{item.title}</h4>
-                <p className="text-gray-500 text-xs mt-0.5">{item.desc}</p>
-              </div>
-            </div>
+      {/* Focus Areas */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Our Focus Areas</Text>
+        <View style={styles.focusList}>
+          {focusAreas.map((item, idx) => (
+            <View key={idx} style={styles.focusCard}>
+              <Text style={styles.focusIcon}>{item.icon}</Text>
+              <View style={styles.focusContent}>
+                <Text style={styles.focusTitle}>{item.title}</Text>
+                <Text style={styles.focusDesc}>{item.desc}</Text>
+              </View>
+            </View>
           ))}
-        </div>
-      </div>
+        </View>
+      </View>
 
       {/* Diploma Program */}
-      <div className="px-5 mt-6">
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-3xl">🎓</span>
-            <div>
-              <h4 className="text-amber-900 font-bold text-sm">Diploma Program 2026</h4>
-              <p className="text-amber-700 text-xs mt-1 leading-relaxed">
-                Critical Social Thought & Islamic Tradition — A comprehensive program 
-                exploring the intersections of modern social theory and Islamic intellectual heritage.
-              </p>
-              <button className="mt-3 bg-amber-600 text-white text-xs font-medium px-4 py-2 rounded-lg active:bg-amber-700 transition-colors">
-                Learn More →
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Contact */}
-      <div className="px-5 mt-6">
-        <h3 className="text-gray-900 font-bold text-base mb-3">Connect With Us</h3>
-        <div className="flex gap-3">
-          {[
-            { icon: '🌐', label: 'Website' },
-            { icon: '📧', label: 'Email' },
-            { icon: '📱', label: 'Social' },
-            { icon: '🎙️', label: 'Podcast' },
-          ].map((item, idx) => (
-            <button
-              key={idx}
-              className="flex-1 flex flex-col items-center gap-1 p-3 rounded-xl bg-gray-50 border border-gray-100 active:bg-gray-100 transition-colors"
+      <View style={styles.sectionContainer}>
+        <View style={styles.diplomaCard}>
+          <Text style={styles.diplomaIcon}>🎓</Text>
+          <View style={styles.diplomaContent}>
+            <Text style={styles.diplomaTitle}>Diploma Program 2026</Text>
+            <Text style={styles.diplomaDesc}>
+              Critical Social Thought & Islamic Tradition — A comprehensive program exploring the intersections of modern social theory and Islamic intellectual heritage.
+            </Text>
+            <TouchableOpacity
+              style={styles.learnMoreBtn}
+              activeOpacity={0.8}
+              onPress={() => Alert.alert('Diploma Program', 'Applications open for 2026! Visit themuslimminds.org/diploma')}
             >
-              <span className="text-xl">{item.icon}</span>
-              <span className="text-[10px] text-gray-600 font-medium">{item.label}</span>
-            </button>
+              <Text style={styles.learnMoreText}>Learn More →</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      {/* Connect With Us */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>Connect With Us</Text>
+        <View style={styles.connectRow}>
+          {[
+            { icon: 'globe-outline' as const, label: 'Website' },
+            { icon: 'mail-outline' as const, label: 'Email' },
+            { icon: 'share-social-outline' as const, label: 'Social' },
+            { icon: 'mic-outline' as const, label: 'Podcast' },
+          ].map((item, idx) => (
+            <TouchableOpacity
+              key={idx}
+              style={styles.connectBtn}
+              activeOpacity={0.7}
+              onPress={() => handleConnect(item.label)}
+            >
+              <Ionicons name={item.icon} size={22} color={colors.primary} />
+              <Text style={styles.connectLabel}>{item.label}</Text>
+            </TouchableOpacity>
           ))}
-        </div>
-      </div>
+        </View>
+      </View>
 
       {/* Footer */}
-      <div className="px-5 mt-8 text-center">
-        <p className="text-gray-400 text-xs">© 2026 The Muslim Minds</p>
-        <p className="text-gray-300 text-[10px] mt-1">themuslimminds.org</p>
-      </div>
-    </div>
+      <View style={styles.footer}>
+        <Text style={styles.footerCopy}>© 2026 The Muslim Minds</Text>
+        <Text style={styles.footerLink}>themuslimminds.org</Text>
+      </View>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 40,
+    alignItems: 'center',
+  },
+  mosqueBadge: {
+    width: 76,
+    height: 76,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  mosqueIcon: {
+    fontSize: 38,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: -0.5,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: '#a7f3d0',
+    fontWeight: '500',
+    marginTop: 3,
+  },
+  headerBio: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.85)',
+    textAlign: 'center',
+    marginTop: 10,
+    lineHeight: 18,
+    paddingHorizontal: 16,
+  },
+  statsWrapper: {
+    paddingHorizontal: 20,
+    marginTop: -24,
+  },
+  statsCard: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderRadius: 18,
+    paddingVertical: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+    alignItems: 'center',
+  },
+  statCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#e2e8f0',
+  },
+  statNumber: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  statLabel: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  sectionContainer: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#0f172a',
+    marginBottom: 10,
+  },
+  paragraph: {
+    fontSize: 13,
+    lineHeight: 21,
+    color: '#475569',
+  },
+  focusList: {
+    gap: 10,
+  },
+  focusCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    borderRadius: 14,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  focusIcon: {
+    fontSize: 22,
+    marginRight: 12,
+  },
+  focusContent: {
+    flex: 1,
+  },
+  focusTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  focusDesc: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 3,
+    lineHeight: 16,
+  },
+  diplomaCard: {
+    flexDirection: 'row',
+    backgroundColor: '#fffbeb',
+    borderWidth: 1,
+    borderColor: '#fde68a',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'flex-start',
+  },
+  diplomaIcon: {
+    fontSize: 28,
+    marginRight: 12,
+  },
+  diplomaContent: {
+    flex: 1,
+  },
+  diplomaTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#92400e',
+  },
+  diplomaDesc: {
+    fontSize: 11,
+    color: '#b45309',
+    lineHeight: 16,
+    marginTop: 4,
+  },
+  learnMoreBtn: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#d97706',
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  learnMoreText: {
+    color: '#ffffff',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  connectRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  connectBtn: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+  },
+  connectLabel: {
+    fontSize: 10,
+    color: '#475569',
+    fontWeight: '600',
+    marginTop: 4,
+  },
+  footer: {
+    marginTop: 36,
+    marginBottom: 40,
+    alignItems: 'center',
+  },
+  footerCopy: {
+    fontSize: 12,
+    color: '#94a3b8',
+  },
+  footerLink: {
+    fontSize: 11,
+    color: '#cbd5e1',
+    marginTop: 3,
+  },
+});

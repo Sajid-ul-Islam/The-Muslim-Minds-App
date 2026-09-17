@@ -7,12 +7,16 @@ import {
   StyleSheet,
   Linking,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
+import { useOTAUpdate } from '../hooks/useOTAUpdate';
 
 export default function AboutScreen() {
+  const { checkForUpdate, isChecking, isUpdateReady, reloadApp, metadata } = useOTAUpdate(false);
+
   const handleConnect = (type: string) => {
     if (type === 'Website') {
       Linking.openURL('https://themuslimminds.org').catch(() => {
@@ -20,6 +24,22 @@ export default function AboutScreen() {
       });
     } else {
       Alert.alert(type, `Connect with us via ${type} at contact@themuslimminds.org`);
+    }
+  };
+
+  const handleCheckUpdates = async () => {
+    const result = await checkForUpdate(true);
+    if (result.isAvailable) {
+      Alert.alert(
+        'Update Ready',
+        'A new version has been downloaded. Restart the app now to apply it.',
+        [
+          { text: 'Later', style: 'cancel' },
+          { text: 'Restart Now', onPress: reloadApp },
+        ]
+      );
+    } else {
+      Alert.alert('App Updates', result.message || 'Your app is up to date.');
     }
   };
 
@@ -113,6 +133,56 @@ export default function AboutScreen() {
               <Text style={styles.learnMoreText}>Learn More →</Text>
             </TouchableOpacity>
           </View>
+        </View>
+      </View>
+
+      {/* App Updates (OTA) */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>App Updates</Text>
+        <View style={styles.updateCard}>
+          <View style={styles.updateRow}>
+            <View style={styles.updateIconWrap}>
+              <Ionicons name="cloud-download-outline" size={24} color={colors.primary} />
+            </View>
+            <View style={styles.updateInfo}>
+              <Text style={styles.updateVersion}>The Muslim Minds v1.0.0</Text>
+              <Text style={styles.updateStatus}>
+                {metadata.isEnabled
+                  ? `OTA Updates: Active (${metadata.channel || 'production'})`
+                  : 'OTA Updates: Active in standalone builds'}
+              </Text>
+            </View>
+          </View>
+
+          {isUpdateReady ? (
+            <TouchableOpacity
+              style={[styles.updateActionBtn, { backgroundColor: colors.primaryDark }]}
+              activeOpacity={0.8}
+              onPress={reloadApp}
+            >
+              <Ionicons name="refresh" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+              <Text style={styles.updateActionText}>Restart to Apply Update</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.updateActionBtn}
+              activeOpacity={0.8}
+              disabled={isChecking}
+              onPress={handleCheckUpdates}
+            >
+              {isChecking ? (
+                <>
+                  <ActivityIndicator size="small" color="#ffffff" style={{ marginRight: 8 }} />
+                  <Text style={styles.updateActionText}>Checking for Updates...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="sync-outline" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+                  <Text style={styles.updateActionText}>Check for Updates</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -317,6 +387,58 @@ const styles = StyleSheet.create({
   learnMoreText: {
     color: '#ffffff',
     fontSize: 11,
+    fontWeight: '700',
+  },
+  updateCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  updateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  updateIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#ecfdf5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  updateInfo: {
+    flex: 1,
+  },
+  updateVersion: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  updateStatus: {
+    fontSize: 11,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  updateActionBtn: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updateActionText: {
+    color: '#ffffff',
+    fontSize: 12,
     fontWeight: '700',
   },
   connectRow: {

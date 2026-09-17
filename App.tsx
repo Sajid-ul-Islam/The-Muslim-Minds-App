@@ -9,11 +9,16 @@ import VideosScreen from './src/components/VideosScreen';
 import AboutScreen from './src/components/AboutScreen';
 import ArticleDetail from './src/components/ArticleDetail';
 import BottomNav, { Screen } from './src/components/BottomNav';
+import UpdateBanner from './src/components/UpdateBanner';
+import { useOTAUpdate } from './src/hooks/useOTAUpdate';
 import { articles } from './src/data';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('home');
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
+
+  // Initialize OTA updates listener and auto-check
+  const { isUpdateReady, reloadApp, dismissUpdate } = useOTAUpdate(true);
 
   const selectedArticle = selectedArticleId
     ? articles.find((a) => a.id === selectedArticleId) || null
@@ -52,7 +57,16 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <StatusBar style={selectedArticle || activeScreen === 'home' || activeScreen === 'about' ? 'light' : 'dark'} />
+        
+        {/* OTA Update Banner */}
+        <UpdateBanner
+          visible={isUpdateReady}
+          onRestart={reloadApp}
+          onDismiss={dismissUpdate}
+        />
+
         <View style={styles.screenContainer}>{renderScreen()}</View>
+
         {!selectedArticle && (
           <BottomNav active={activeScreen} onNavigate={setActiveScreen} />
         )}

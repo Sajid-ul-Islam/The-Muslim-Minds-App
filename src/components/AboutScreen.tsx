@@ -8,22 +8,34 @@ import {
   Linking,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
 import { useOTAUpdate } from '../hooks/useOTAUpdate';
 
 export default function AboutScreen() {
+  const insets = useSafeAreaInsets();
   const { checkForUpdate, isChecking, isUpdateReady, reloadApp, metadata } = useOTAUpdate(false);
 
   const handleConnect = (type: string) => {
-    if (type === 'Website') {
-      Linking.openURL('https://themuslimminds.org').catch(() => {
-        Alert.alert('Website', 'Visit https://themuslimminds.org');
-      });
-    } else {
-      Alert.alert(type, `Connect with us via ${type} at contact@themuslimminds.org`);
+    switch (type) {
+      case 'Website':
+        Linking.openURL('https://themuslimminds.org').catch(() => {});
+        break;
+      case 'YouTube':
+        Linking.openURL('https://www.youtube.com/@themuslimmindsbd').catch(() => {});
+        break;
+      case 'Twitter/X':
+        Linking.openURL('https://x.com/demuslimmindsbd').catch(() => {});
+        break;
+      case 'Facebook':
+        Linking.openURL('https://www.facebook.com/themuslimmindsbd').catch(() => {});
+        break;
+      default:
+        Alert.alert(type, 'Visit themuslimminds.org or email contact@themuslimminds.org');
     }
   };
 
@@ -44,26 +56,40 @@ export default function AboutScreen() {
   };
 
   const focusAreas = [
-    { icon: '📚', title: 'Philosophy & Political Thought', desc: 'Critical engagement with Western and Islamic philosophical traditions' },
-    { icon: '🏛️', title: 'History & Decolonial Studies', desc: 'Re-examining history through decolonial frameworks' },
-    { icon: '🌍', title: 'Geopolitics & Contemporary Analysis', desc: 'Understanding current events through Islamic perspectives' },
-    { icon: '🕌', title: 'Islamic Thought & Tradition', desc: 'Exploring the richness of Islamic intellectual heritage' },
+    { icon: '📚', title: 'Philosophy & Political Thought', titleBn: 'দর্শন ও রাজনৈতিক চিন্তাধারা', desc: 'Critical engagement with Western and Islamic philosophical traditions' },
+    { icon: '🏛️', title: 'History & Decolonial Studies', titleBn: 'ইতিহাস ও উপনিবেশহীন জ্ঞানকাণ্ড', desc: 'Re-examining history and knowledge through decolonial frameworks' },
+    { icon: '🌍', title: 'Geopolitics & Contemporary Analysis', titleBn: 'সমসাময়িক ভূ-রাজনীতি ও বিশ্লেষণ', desc: 'Understanding global dynamics and statecraft through Islamic perspectives' },
+    { icon: '🕌', title: 'Islamic Thought & Tradition', titleBn: 'ইসলামিক ঐতিহ্য ও বুদ্ধিবৃত্তিক ধারা', desc: 'Exploring the depth of classical tradition and modern challenges' },
   ];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
+      {/* Edge-to-Edge Brand Header */}
       <LinearGradient
-        colors={['#047857', '#065f46', '#134e4a']}
-        style={styles.header}
+        colors={colors.primaryGradient}
+        style={[styles.header, { paddingTop: insets.top + 20 }]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <View style={styles.mosqueBadge}>
-          <Text style={styles.mosqueIcon}>🕌</Text>
+        {/* Official Brand Icon */}
+        <View style={styles.brandIconWrapper}>
+          <Image
+            source={require('../../assets/brand-icon.png')}
+            style={styles.brandIcon}
+            resizeMode="cover"
+          />
         </View>
-        <Text style={styles.headerTitle}>The Muslim Minds</Text>
+
+        {/* Official Logo Text */}
+        <Image
+          source={require('../../assets/logo-white.png')}
+          style={styles.headerLogo}
+          resizeMode="contain"
+        />
+
+        <Text style={styles.headerTagline}>Decoding Muslim Minds</Text>
         <Text style={styles.headerSubtitle}>Intellectual Discourse & Analysis</Text>
+
         <Text style={styles.headerBio}>
           Exploring philosophy, history, politics, and Islamic thought through rigorous intellectual discourse.
         </Text>
@@ -91,12 +117,12 @@ export default function AboutScreen() {
 
       {/* About Us */}
       <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>About Us</Text>
+        <Text style={styles.sectionTitle}>About Us • আমাদের কথা</Text>
         <Text style={styles.paragraph}>
           The Muslim Minds is a platform dedicated to fostering critical intellectual discourse within the Muslim community. We explore philosophy, history, political thought, decolonial studies, and Islamic tradition through rigorous analysis and diverse perspectives.
         </Text>
         <Text style={[styles.paragraph, { marginTop: 10 }]}>
-          Our mission is to decolonize knowledge systems and provide a space for authentic Muslim intellectual engagement with contemporary issues.
+          আমাদের উদ্দেশ্য হলো বুদ্ধিবৃত্তিক জ্ঞানচর্চার বিকাশ, উপনিবেশহীন চিন্তা এবং সমসাময়িক সংকটসমূহের গভীর বিশ্লেষণ প্রদান করা।
         </Text>
       </View>
 
@@ -109,6 +135,7 @@ export default function AboutScreen() {
               <Text style={styles.focusIcon}>{item.icon}</Text>
               <View style={styles.focusContent}>
                 <Text style={styles.focusTitle}>{item.title}</Text>
+                <Text style={styles.focusTitleBn}>{item.titleBn}</Text>
                 <Text style={styles.focusDesc}>{item.desc}</Text>
               </View>
             </View>
@@ -122,15 +149,16 @@ export default function AboutScreen() {
           <Text style={styles.diplomaIcon}>🎓</Text>
           <View style={styles.diplomaContent}>
             <Text style={styles.diplomaTitle}>Diploma Program 2026</Text>
+            <Text style={styles.diplomaTitleBn}>নতুন ডিপ্লোমা প্রোগ্রাম ২০২৬</Text>
             <Text style={styles.diplomaDesc}>
               Critical Social Thought & Islamic Tradition — A comprehensive program exploring the intersections of modern social theory and Islamic intellectual heritage.
             </Text>
             <TouchableOpacity
               style={styles.learnMoreBtn}
               activeOpacity={0.8}
-              onPress={() => Alert.alert('Diploma Program', 'Applications open for 2026! Visit themuslimminds.org/diploma')}
+              onPress={() => Linking.openURL('https://themuslimminds.org/diploma').catch(() => {})}
             >
-              <Text style={styles.learnMoreText}>Learn More →</Text>
+              <Text style={styles.learnMoreText}>Visit Diploma Page →</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -192,9 +220,9 @@ export default function AboutScreen() {
         <View style={styles.connectRow}>
           {[
             { icon: 'globe-outline' as const, label: 'Website' },
-            { icon: 'mail-outline' as const, label: 'Email' },
-            { icon: 'share-social-outline' as const, label: 'Social' },
-            { icon: 'mic-outline' as const, label: 'Podcast' },
+            { icon: 'logo-youtube' as const, label: 'YouTube' },
+            { icon: 'logo-twitter' as const, label: 'Twitter/X' },
+            { icon: 'logo-facebook' as const, label: 'Facebook' },
           ].map((item, idx) => (
             <TouchableOpacity
               key={idx}
@@ -225,41 +253,47 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 24,
-    paddingTop: 32,
     paddingBottom: 40,
     alignItems: 'center',
   },
-  mosqueBadge: {
-    width: 76,
-    height: 76,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  brandIconWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 6,
     marginBottom: 14,
   },
-  mosqueIcon: {
-    fontSize: 38,
+  brandIcon: {
+    width: '100%',
+    height: '100%',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: -0.5,
+  headerLogo: {
+    width: 200,
+    height: 44,
+  },
+  headerTagline: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#93c5fd',
+    marginTop: 4,
+    letterSpacing: 0.3,
   },
   headerSubtitle: {
-    fontSize: 13,
-    color: '#a7f3d0',
+    fontSize: 12,
+    color: '#bfdbfe',
     fontWeight: '500',
-    marginTop: 3,
+    marginTop: 2,
   },
   headerBio: {
     fontSize: 12,
     color: 'rgba(255, 255, 255, 0.85)',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 12,
     lineHeight: 18,
     paddingHorizontal: 16,
   },
@@ -343,6 +377,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0f172a',
   },
+  focusTitleBn: {
+    fontSize: 11,
+    color: colors.primary,
+    fontWeight: '600',
+    marginTop: 1,
+  },
   focusDesc: {
     fontSize: 11,
     color: '#64748b',
@@ -351,9 +391,9 @@ const styles = StyleSheet.create({
   },
   diplomaCard: {
     flexDirection: 'row',
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#eff6ff',
     borderWidth: 1,
-    borderColor: '#fde68a',
+    borderColor: '#bfdbfe',
     borderRadius: 16,
     padding: 16,
     alignItems: 'flex-start',
@@ -368,17 +408,23 @@ const styles = StyleSheet.create({
   diplomaTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#92400e',
+    color: '#1e3a8a',
+  },
+  diplomaTitleBn: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+    marginTop: 1,
   },
   diplomaDesc: {
     fontSize: 11,
-    color: '#b45309',
+    color: '#1e40af',
     lineHeight: 16,
     marginTop: 4,
   },
   learnMoreBtn: {
     alignSelf: 'flex-start',
-    backgroundColor: '#d97706',
+    backgroundColor: colors.primary,
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -410,7 +456,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#ecfdf5',
+    backgroundColor: '#eff6ff',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

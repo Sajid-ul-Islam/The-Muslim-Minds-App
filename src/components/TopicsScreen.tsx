@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { categories, articles, Category, Article } from '../data';
 import { colors, getGradientColors, getCategoryBadgeStyle } from '../theme';
@@ -20,24 +21,29 @@ const windowWidth = Dimensions.get('window').width;
 const cardWidth = (windowWidth - 40 - 12) / 2;
 
 export default function TopicsScreen({ onArticlePress }: TopicsScreenProps) {
+  const insets = useSafeAreaInsets();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const filteredArticles = selectedCategory
-    ? articles.filter((a) => a.category.toLowerCase().includes(selectedCategory.toLowerCase()))
+    ? articles.filter(
+        (a) =>
+          a.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+          (a.categoryBn && a.categoryBn.includes(selectedCategory))
+      )
     : articles;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Topics</Text>
-        <Text style={styles.headerSubtitle}>Explore by category</Text>
+      {/* Edge-to-Edge Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <Text style={styles.headerTitle}>Topics • বিষয়শ্রেণী</Text>
+        <Text style={styles.headerSubtitle}>Explore articles by intellectual categories</Text>
       </View>
 
       {/* Categories Grid */}
       <View style={styles.gridContainer}>
         {categories.map((cat: Category) => {
-          const isSelected = selectedCategory === cat.name;
+          const isSelected = selectedCategory === cat.name || selectedCategory === cat.nameBn;
           return (
             <TouchableOpacity
               key={cat.id}
@@ -51,16 +57,22 @@ export default function TopicsScreen({ onArticlePress }: TopicsScreenProps) {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.categoryIcon}>{cat.icon}</Text>
-                <Text style={styles.categoryName} numberOfLines={2}>
-                  {cat.name}
-                </Text>
-                <Text style={styles.categoryCount}>{cat.count} Articles</Text>
-                {isSelected && (
-                  <View style={styles.checkmarkBadge}>
-                    <Ionicons name="checkmark-circle" size={18} color="#ffffff" />
-                  </View>
-                )}
+                <View style={styles.cardTopRow}>
+                  <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                  {isSelected && (
+                    <Ionicons name="checkmark-circle" size={20} color="#ffffff" />
+                  )}
+                </View>
+
+                <View>
+                  <Text style={styles.categoryNameBn} numberOfLines={1}>
+                    {cat.nameBn}
+                  </Text>
+                  <Text style={styles.categoryName} numberOfLines={1}>
+                    {cat.name}
+                  </Text>
+                  <Text style={styles.categoryCount}>{cat.count} Articles</Text>
+                </View>
               </LinearGradient>
             </TouchableOpacity>
           );
@@ -96,12 +108,13 @@ export default function TopicsScreen({ onArticlePress }: TopicsScreenProps) {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <Ionicons name="document-text-outline" size={22} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="document-text-outline" size={22} color="rgba(255,255,255,0.75)" />
                 </LinearGradient>
 
                 <View style={styles.articleInfo}>
                   <View style={[styles.inlineBadge, { backgroundColor: badgeStyle.bg }]}>
                     <Text style={[styles.inlineBadgeText, { color: badgeStyle.text }]}>
+                      {article.categoryBn ? `${article.categoryBn} • ` : ''}
                       {article.category}
                     </Text>
                   </View>
@@ -129,7 +142,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingTop: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
@@ -169,28 +181,33 @@ const styles = StyleSheet.create({
   },
   cardGradient: {
     padding: 14,
-    minHeight: 110,
+    minHeight: 120,
     justifyContent: 'space-between',
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   categoryIcon: {
     fontSize: 26,
   },
-  categoryName: {
+  categoryNameBn: {
     color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '700',
-    lineHeight: 18,
-    marginTop: 8,
+    fontSize: 15,
+    fontWeight: '800',
+    lineHeight: 20,
+  },
+  categoryName: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 1,
   },
   categoryCount: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontSize: 10,
     marginTop: 4,
-  },
-  checkmarkBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
   },
   articlesSection: {
     marginTop: 24,
@@ -210,7 +227,7 @@ const styles = StyleSheet.create({
   },
   clearFilterText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.primary,
   },
   articlesList: {
@@ -230,8 +247,8 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   articleThumbnail: {
-    width: 70,
-    height: 70,
+    width: 72,
+    height: 72,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',

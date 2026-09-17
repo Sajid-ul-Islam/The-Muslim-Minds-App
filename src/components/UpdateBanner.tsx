@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
@@ -11,12 +12,13 @@ interface UpdateBannerProps {
 }
 
 export default function UpdateBanner({ visible, onRestart, onDismiss }: UpdateBannerProps) {
+  const insets = useSafeAreaInsets();
   if (!visible) return null;
 
   return (
-    <View style={styles.bannerContainer}>
+    <View style={[styles.bannerContainer, { paddingTop: (insets.top || 10) + 6 }]}>
       <LinearGradient
-        colors={['#065f46', '#047857']}
+        colors={['#0056D2', '#020D34']}
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
@@ -36,7 +38,7 @@ export default function UpdateBanner({ visible, onRestart, onDismiss }: UpdateBa
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.dismissButton} activeOpacity={0.7} onPress={onDismiss}>
-            <Ionicons name="close" size={16} color="#d1fae5" />
+            <Ionicons name="close" size={16} color="#93c5fd" />
           </TouchableOpacity>
         </View>
       </LinearGradient>

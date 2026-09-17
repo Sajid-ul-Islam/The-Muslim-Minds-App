@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  StatusBar,
+  Image,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { articles, featuredPosts, speakers, Article } from '../data';
 import { colors, getGradientColors, getCategoryBadgeStyle } from '../theme';
@@ -19,6 +21,7 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreenProps) {
+  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredArticles = searchQuery.trim()
@@ -26,28 +29,37 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
         (a) =>
           a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           a.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.category.toLowerCase().includes(searchQuery.toLowerCase())
+          a.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (a.categoryBn && a.categoryBn.includes(searchQuery.trim()))
       )
     : articles;
 
   const heroArticle = featuredPosts[0];
 
+  const handleDiplomaPress = () => {
+    Linking.openURL('https://themuslimminds.org/diploma').catch(() => {});
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <StatusBar barStyle="light-content" backgroundColor="#047857" />
-
-      {/* Header */}
+      {/* Edge-to-Edge Brand Header */}
       <LinearGradient
-        colors={['#047857', '#065f46', '#134e4a']}
-        style={styles.header}
+        colors={colors.primaryGradient}
+        style={[styles.header, { paddingTop: insets.top + 10 }]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <View style={styles.topRow}>
-          <View>
-            <Text style={styles.appTitle}>The Muslim Minds</Text>
-            <Text style={styles.appSubtitle}>Intellectual Discourse & Analysis</Text>
+          <View style={styles.brandRow}>
+            {/* Official The Muslim Minds Logo */}
+            <Image
+              source={require('../../assets/logo-white.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.appTagline}>Decoding Muslim Minds</Text>
           </View>
+
           <TouchableOpacity style={styles.bellButton} activeOpacity={0.8}>
             <Ionicons name="notifications-outline" size={20} color="#ffffff" />
           </TouchableOpacity>
@@ -55,32 +67,37 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={18} color="#a7f3d0" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={18} color="#93c5fd" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search articles, topics, authors..."
-            placeholderTextColor="#a7f3d0"
+            placeholderTextColor="#93c5fd"
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={18} color="#a7f3d0" />
+              <Ionicons name="close-circle" size={18} color="#93c5fd" />
             </TouchableOpacity>
           )}
         </View>
       </LinearGradient>
 
-      {/* Announcement Banner */}
+      {/* Official Announcement Banner */}
       <View style={styles.bannerWrapper}>
-        <View style={styles.banner}>
-          <Text style={styles.bannerEmoji}>🎓</Text>
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>New Diploma Program 2026</Text>
-            <Text style={styles.bannerSubtitle}>Critical Social Thought & Islamic Tradition</Text>
+        <TouchableOpacity style={styles.banner} activeOpacity={0.85} onPress={handleDiplomaPress}>
+          <View style={styles.bannerIconCircle}>
+            <Text style={styles.bannerEmoji}>🎓</Text>
           </View>
-          <Ionicons name="arrow-forward" size={18} color="#b45309" />
-        </View>
+          <View style={styles.bannerContent}>
+            <View style={styles.bannerBadgeRow}>
+              <Text style={styles.bannerBadge}>Diploma 2026</Text>
+              <Text style={styles.bannerTitle}>নতুন ডিপ্লোমা প্রোগ্রাম শুরু হয়েছে!</Text>
+            </View>
+            <Text style={styles.bannerSubtitle}>ক্রিটিক্যাল সোশ্যাল থট অ্যান্ড ইসলামিক ট্র্যাডিশন</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {/* Hero Featured Article */}
@@ -110,6 +127,7 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
                       { color: getCategoryBadgeStyle(heroArticle.categoryColor).text },
                     ]}
                   >
+                    {heroArticle.categoryBn ? `${heroArticle.categoryBn} • ` : ''}
                     {heroArticle.category}
                   </Text>
                 </View>
@@ -152,12 +170,13 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <Ionicons name="document-text-outline" size={24} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="document-text-outline" size={24} color="rgba(255,255,255,0.75)" />
                 </LinearGradient>
 
                 <View style={styles.articleInfo}>
                   <View style={[styles.inlineBadge, { backgroundColor: badgeStyle.bg }]}>
                     <Text style={[styles.inlineBadgeText, { color: badgeStyle.text }]}>
+                      {article.categoryBn ? `${article.categoryBn} • ` : ''}
                       {article.category}
                     </Text>
                   </View>
@@ -192,7 +211,7 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
             {speakers.map((speaker, idx) => (
               <View key={idx} style={styles.speakerCard}>
                 <LinearGradient
-                  colors={['#10b981', '#0d9488']}
+                  colors={['#0056D2', '#020D34']}
                   style={styles.speakerAvatar}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -231,12 +250,13 @@ export default function HomeScreen({ onArticlePress, onSeeAllPress }: HomeScreen
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   >
-                    <Ionicons name="document-text-outline" size={24} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="document-text-outline" size={24} color="rgba(255,255,255,0.75)" />
                   </LinearGradient>
 
                   <View style={styles.articleInfo}>
                     <View style={[styles.inlineBadge, { backgroundColor: badgeStyle.bg }]}>
                       <Text style={[styles.inlineBadgeText, { color: badgeStyle.text }]}>
+                        {article.categoryBn ? `${article.categoryBn} • ` : ''}
                         {article.category}
                       </Text>
                     </View>
@@ -264,7 +284,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
     paddingBottom: 28,
   },
   topRow: {
@@ -273,35 +292,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  appTitle: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: -0.5,
+  brandRow: {
+    flex: 1,
   },
-  appSubtitle: {
-    color: '#a7f3d0',
-    fontSize: 13,
+  logoImage: {
+    width: 170,
+    height: 40,
+    alignSelf: 'flex-start',
+  },
+  appTagline: {
+    color: '#93c5fd',
+    fontSize: 12,
     marginTop: 2,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 0.2,
   },
   bellButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 14,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   searchIcon: {
     marginRight: 10,
@@ -319,32 +343,55 @@ const styles = StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#fde68a',
-    borderRadius: 14,
+    borderColor: '#e2e8f0',
+    borderRadius: 16,
     padding: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  bannerIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#eff6ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
   },
   bannerEmoji: {
-    fontSize: 22,
-    marginRight: 12,
+    fontSize: 20,
   },
   bannerContent: {
     flex: 1,
   },
+  bannerBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  bannerBadge: {
+    backgroundColor: '#dbeafe',
+    color: colors.primary,
+    fontSize: 9,
+    fontWeight: '800',
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 4,
+  },
   bannerTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#92400e',
+    color: '#0f172a',
   },
   bannerSubtitle: {
     fontSize: 11,
-    color: '#b45309',
+    color: '#64748b',
     marginTop: 2,
   },
   sectionContainer: {
@@ -367,7 +414,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.primary,
   },
   heroCard: {
@@ -380,23 +427,23 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   heroGradient: {
-    height: 200,
+    height: 205,
     justifyContent: 'flex-end',
   },
   heroOverlay: {
     padding: 16,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(2, 13, 52, 0.45)',
   },
   categoryBadge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 10,
     marginBottom: 8,
   },
   categoryBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   heroTitle: {
     color: '#ffffff',
@@ -475,7 +522,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
   },

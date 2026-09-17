@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
 
@@ -11,15 +12,23 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ active, onNavigate }: BottomNavProps) {
-  const navItems: { id: Screen; label: string; icon: keyof typeof Ionicons.glyphMap; iconActive: keyof typeof Ionicons.glyphMap }[] = [
-    { id: 'home', label: 'Home', icon: 'home-outline', iconActive: 'home' },
-    { id: 'topics', label: 'Topics', icon: 'folder-outline', iconActive: 'folder' },
-    { id: 'videos', label: 'Videos', icon: 'play-circle-outline', iconActive: 'play-circle' },
-    { id: 'about', label: 'About', icon: 'information-circle-outline', iconActive: 'information-circle' },
+  const insets = useSafeAreaInsets();
+
+  const navItems: {
+    id: Screen;
+    label: string;
+    labelBn: string;
+    icon: keyof typeof Ionicons.glyphMap;
+    iconActive: keyof typeof Ionicons.glyphMap;
+  }[] = [
+    { id: 'home', label: 'Home', labelBn: 'প্রচ্ছদ', icon: 'home-outline', iconActive: 'home' },
+    { id: 'topics', label: 'Topics', labelBn: 'টপিকস', icon: 'grid-outline', iconActive: 'grid' },
+    { id: 'videos', label: 'Videos', labelBn: 'ভিডিও', icon: 'play-circle-outline', iconActive: 'play-circle' },
+    { id: 'about', label: 'About', labelBn: 'আমাদের কথা', icon: 'information-circle-outline', iconActive: 'information-circle' },
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       <View style={styles.navRow}>
         {navItems.map((item) => {
           const isActive = active === item.id;
@@ -38,7 +47,11 @@ export default function BottomNav({ active, onNavigate }: BottomNavProps) {
               <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
                 {item.label}
               </Text>
-              {isActive ? <View style={styles.activeDot} /> : <View style={styles.inactiveDotPlaceholder} />}
+              {isActive ? (
+                <View style={styles.activeDot} />
+              ) : (
+                <View style={styles.inactiveDotPlaceholder} />
+              )}
             </TouchableOpacity>
           );
         })}
@@ -53,12 +66,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#f1f5f9',
     paddingTop: 8,
-    paddingBottom: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 10,
   },
   navRow: {
     flexDirection: 'row',
@@ -69,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 4,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
   },
   navLabel: {
     fontSize: 11,
@@ -79,7 +91,7 @@ const styles = StyleSheet.create({
   },
   navLabelActive: {
     color: colors.primary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   activeDot: {
     width: 4,

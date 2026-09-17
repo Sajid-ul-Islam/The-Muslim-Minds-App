@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Platform, StatusBar as RNStatusBar } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import HomeScreen from './src/components/HomeScreen';
@@ -12,6 +12,7 @@ import BottomNav, { Screen } from './src/components/BottomNav';
 import UpdateBanner from './src/components/UpdateBanner';
 import { useOTAUpdate } from './src/hooks/useOTAUpdate';
 import { articles } from './src/data';
+import { colors } from './src/theme';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<Screen>('home');
@@ -19,6 +20,13 @@ export default function App() {
 
   // Initialize OTA updates listener and auto-check
   const { isUpdateReady, reloadApp, dismissUpdate } = useOTAUpdate(true);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      RNStatusBar.setTranslucent(true);
+      RNStatusBar.setBackgroundColor('transparent');
+    }
+  }, []);
 
   const selectedArticle = selectedArticleId
     ? articles.find((a) => a.id === selectedArticleId) || null
@@ -53,11 +61,16 @@ export default function App() {
     }
   };
 
+  const isLightStatusBar =
+    selectedArticle !== null ||
+    activeScreen === 'home' ||
+    activeScreen === 'about';
+
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <StatusBar style={selectedArticle || activeScreen === 'home' || activeScreen === 'about' ? 'light' : 'dark'} />
-        
+      <View style={styles.root}>
+        <StatusBar style={isLightStatusBar ? 'light' : 'dark'} />
+
         {/* OTA Update Banner */}
         <UpdateBanner
           visible={isUpdateReady}
@@ -65,20 +78,22 @@ export default function App() {
           onDismiss={dismissUpdate}
         />
 
+        {/* Edge-to-Edge Full Screen Content */}
         <View style={styles.screenContainer}>{renderScreen()}</View>
 
+        {/* Bottom Navigation */}
         {!selectedArticle && (
           <BottomNav active={activeScreen} onNavigate={setActiveScreen} />
         )}
-      </SafeAreaView>
+      </View>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
-    backgroundColor: '#047857',
+    backgroundColor: '#ffffff',
   },
   screenContainer: {
     flex: 1,

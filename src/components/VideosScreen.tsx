@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { getGradientColors } from '../theme';
 
@@ -20,6 +21,8 @@ interface VideoItem {
 }
 
 export default function VideosScreen() {
+  const insets = useSafeAreaInsets();
+
   const videos: VideoItem[] = [
     {
       id: 1,
@@ -35,7 +38,7 @@ export default function VideosScreen() {
       duration: '38:15',
       speaker: 'Musa Al Hafij',
       views: '8.7K',
-      gradient: 'from-emerald-600 to-teal-800',
+      gradient: 'from-sky-600 to-blue-800',
     },
     {
       id: 3,
@@ -43,7 +46,7 @@ export default function VideosScreen() {
       duration: '52:30',
       speaker: 'Editorial Team',
       views: '15.2K',
-      gradient: 'from-purple-600 to-violet-800',
+      gradient: 'from-purple-500 to-violet-700',
     },
     {
       id: 4,
@@ -59,7 +62,7 @@ export default function VideosScreen() {
       duration: '55:10',
       speaker: 'Editorial Team',
       views: '21.8K',
-      gradient: 'from-slate-600 to-gray-800',
+      gradient: 'from-gray-700 to-slate-900',
     },
     {
       id: 6,
@@ -67,23 +70,23 @@ export default function VideosScreen() {
       duration: '33:25',
       speaker: 'Editorial Team',
       views: '9.1K',
-      gradient: 'from-rose-600 to-pink-800',
+      gradient: 'from-rose-600 to-red-800',
     },
   ];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Videos</Text>
-        <Text style={styles.headerSubtitle}>Lectures, interviews & discussions</Text>
+      {/* Edge-to-Edge Header */}
+      <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <Text style={styles.headerTitle}>Videos • ভিডিও আর্কাইভ</Text>
+        <Text style={styles.headerSubtitle}>বক্তৃতা, আলোচনা, বুক রিভিউ ও সংশয় নিরসন</Text>
       </View>
 
       {/* Featured Video */}
       <View style={styles.sectionContainer}>
         <TouchableOpacity style={styles.featuredCard} activeOpacity={0.9}>
           <LinearGradient
-            colors={['#047857', '#0f766e', '#164e63']}
+            colors={['#0056D2', '#003E99', '#020D34']}
             style={styles.featuredGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -93,7 +96,7 @@ export default function VideosScreen() {
             </View>
             <View style={styles.featuredOverlay}>
               <View style={styles.liveBadge}>
-                <Text style={styles.liveBadgeText}>LIVE</Text>
+                <Text style={styles.liveBadgeText}>FEATURED</Text>
               </View>
               <Text style={styles.featuredTitle}>
                 New Diploma Program 2026 — Introduction
@@ -108,7 +111,7 @@ export default function VideosScreen() {
 
       {/* Video List */}
       <View style={[styles.sectionContainer, styles.lastSection]}>
-        <Text style={styles.sectionTitle}>Recent Videos</Text>
+        <Text style={styles.sectionTitle}>Recent Videos • সাম্প্রতিক ভিডিও</Text>
         <View style={styles.videosList}>
           {videos.map((video) => (
             <TouchableOpacity key={video.id} style={styles.videoCard} activeOpacity={0.7}>
@@ -149,7 +152,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingTop: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f1f5f9',
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: 'rgba(255, 255, 255, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -208,20 +210,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     padding: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    backgroundColor: 'rgba(2, 13, 52, 0.5)',
   },
   liveBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#ef4444',
+    backgroundColor: '#0056D2',
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 8,
+    borderRadius: 6,
     marginBottom: 6,
   },
   liveBadgeText: {
     color: '#ffffff',
     fontSize: 10,
     fontWeight: '800',
+    letterSpacing: 0.5,
   },
   featuredTitle: {
     color: '#ffffff',
@@ -229,7 +232,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   featuredSubtitle: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.85)',
     fontSize: 12,
     marginTop: 2,
   },
@@ -269,7 +272,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 6,
     right: 6,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: 'rgba(2, 13, 52, 0.8)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,

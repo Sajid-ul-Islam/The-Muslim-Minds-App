@@ -8,6 +8,7 @@ import {
   Share,
   Alert,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Article } from '../data';
@@ -19,6 +20,7 @@ interface ArticleDetailProps {
 }
 
 export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
+  const insets = useSafeAreaInsets();
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const handleShare = async () => {
@@ -48,11 +50,21 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
     .slice(0, 2);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Hero Header */}
       <LinearGradient
         colors={getGradientColors(article.imageGradient)}
-        style={styles.hero}
+        style={[
+          styles.hero,
+          {
+            paddingTop: insets.top + 14,
+            height: 250 + insets.top,
+          },
+        ]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
@@ -77,7 +89,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         <View style={styles.heroBottomRow}>
           <View style={[styles.categoryBadge, { backgroundColor: badgeStyle.bg }]}>
             <Text style={[styles.categoryBadgeText, { color: badgeStyle.text }]}>
-              {article.category}
+              {article.categoryBn ? `${article.categoryBn} • ${article.category}` : article.category}
             </Text>
           </View>
         </View>
@@ -90,7 +102,7 @@ export default function ArticleDetail({ article, onBack }: ArticleDetailProps) {
         {/* Author info */}
         <View style={styles.authorRow}>
           <LinearGradient
-            colors={['#10b981', '#0d9488']}
+            colors={['#0056D2', '#7118FF']}
             style={styles.authorAvatar}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -270,7 +282,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   pullQuote: {
-    backgroundColor: '#ecfdf5',
+    backgroundColor: '#eff6ff',
     borderLeftWidth: 4,
     borderLeftColor: colors.primary,
     borderRadius: 8,
@@ -280,7 +292,7 @@ const styles = StyleSheet.create({
   pullQuoteText: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#065f46',
+    color: '#1e40af',
     lineHeight: 22,
   },
   tagsContainer: {
@@ -337,6 +349,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bookmarkBtnActive: {
-    backgroundColor: '#d1fae5',
+    backgroundColor: '#dbeafe',
   },
 });

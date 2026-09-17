@@ -2,10 +2,16 @@
   "expo": {
     "name": "The Muslim Minds",
     "slug": "the-muslim-minds-app",
+    "description": "Decoding Muslim Minds • Intellectual Discourse & Analysis",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#020D34"
+    },
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
@@ -19,11 +25,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#047857",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#0056D2",
+        "foregroundImage": "./assets/android-icon-foreground.png"
       }
+    },
+    "androidStatusBar": {
+      "translucent": true,
+      "backgroundColor": "transparent",
+      "barStyle": "light-content"
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#ffffff",
+      "barStyle": "dark-content"
     },
     "web": {
       "favicon": "./assets/favicon.png"
